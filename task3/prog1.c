@@ -48,21 +48,22 @@ void do_work(int index) {
     sethandler(sig_handler, SIGUSR2);
     sethandler(sig_handler, SIGINT);
 
-    //sigset_t mask, oldmask;
-    //sigemptyset(&mask);
-    //sigaddset(&mask, SIGUSR1);
+    sigset_t mask, oldmask;
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGUSR1);
     //sigaddset(&mask, SIGUSR2);
 
     // Block SIGUSR1 and SIGUSR2 in the process mask
-   // if (sigprocmask(SIG_BLOCK, &mask, &oldmask) == -1)
-     //   ERR("sigprocmask");
+     if (sigprocmask(SIG_BLOCK, &mask, &oldmask) == -1)
+           ERR("sigprocmask");
 
     srand(getpid());
     int count = 0;
 
     for (;;) {
+        last_signal = 0;
         while (last_signal!=SIGUSR1 && last_signal!=SIGINT) {
-            pause();
+            sigsuspend(&oldmask);
         }
         if(last_signal == SIGINT){
             break;
